@@ -72,13 +72,14 @@ function draw()
     started = 1;
     
     // Print trial count at the top left-corner of the canvas
+    noStroke();
     fill(color(255,255,255));
     textAlign(LEFT);
     text("Trial " + (current_trial + 1) + " of " + trials.length, 50, 20);
     
     // Draw all 18 targets
     
-      drawSquares();
+    drawOctagons();
     
 	for (var i = 0; i < 18; i++) {
       drawTarget(i);
@@ -95,6 +96,36 @@ function draw()
     fill(255);
     circle(x, y, 0.5 * PPCM);
   }
+  
+  if (draw_targets) {
+    drawYellowCircle(inputArea.x + 2.5*PPCM, inputArea.y - PPCM);
+    draw2Xtext(inputArea.x + 2.5*PPCM, inputArea.y - PPCM);
+    
+    drawFutureCircle(inputArea.x + 2.5*PPCM, inputArea.y - 2.5*PPCM, 0);
+    
+    drawNormalCircle(inputArea.x + 2.5*PPCM, inputArea.y - 4*PPCM, 0)
+    
+    noStroke();
+    
+    instructionText(inputArea.x + 5*PPCM, inputArea.x + 6*PPCM, inputArea.y - 4*PPCM,
+               inputArea.y - 2.5*PPCM, inputArea.y - PPCM);
+    
+  }
+  
+}
+
+function instructionText(x, x2, y1, y2, y3) {
+    fill(color(255,255,255));
+    noStroke();
+    textFont("Arial", 36);
+  
+    textAlign(CENTER, CENTER);
+  
+    text("Target", x, y1);
+    text("Click Twice", x2, y3);
+    text("Next Target", x2, y2);
+  
+    textFont("Arial", 18);
 }
 
 // Print and save results at the end of 54 trials
@@ -140,6 +171,7 @@ function printAndSavePerformance()
   }
 }
   
+  
 
  
   // 
@@ -175,6 +207,10 @@ function printAndSavePerformance()
   }
 }
 
+function drawInstructions() {
+    draw2Xcircle(inputArea.x, inputArea.y - 5*PPCM);
+  }
+
 // Mouse button was pressed - lets test to see if hit was in the correct target
 function mousePressed() 
 {
@@ -192,8 +228,17 @@ function mousePressed()
     {
       let virtual_x = map(mouseX, inputArea.x, inputArea.x + inputArea.w, 0, width)
       let virtual_y = map(mouseY, inputArea.y, inputArea.y + inputArea.h, 0, height)
-
+      
+    for (var k = 0; k < 18; k++) {
+      let target = getTargetBounds(k);
       if (dist(target.x, target.y, virtual_x, virtual_y) < 1.5*PPCM) {
+        virtual_x = target.x;
+        virtual_y = target.y;
+      }
+    }
+      
+
+      if (dist(target.x, target.y, virtual_x, virtual_y) < target.w/2) {
         miss = 2;
         hits++;
         fitts_IDs.push(Math.log2((DistToTarget/target.w )+ 1).toFixed(3));
@@ -309,10 +354,10 @@ function draw2Xcircle(x, y, w) {
 }
 
 function drawYellowCircle(x, y) {
-    circle(x, y, 1.3*PPCM);
     stroke(color(255, 0, 0));
     strokeWeight(2);
     fill((color(200, 200, 0)));
+    circle(x, y, 1.3*PPCM);
 }
 
 function draw2Xtext(x, y) {
@@ -322,7 +367,6 @@ function draw2Xtext(x, y) {
     textAlign(CENTER, CENTER);
     text("2x", x, y);
     textFont("Arial", 18);
-    // Show the text
 
 }
 
@@ -330,10 +374,10 @@ function draw2Xtext(x, y) {
 
 
 function drawNormalCircle(x, y, w) {
-    circle(x, y, 1.3*PPCM);
     fill(color(0, 255, 0));
     stroke(color(0, 100, 0));
     strokeWeight(4);
+    circle(x, y, 1.3*PPCM);
 
 
     if (insideInputArea(mouseX, mouseY)) {
@@ -350,10 +394,10 @@ function drawNormalCircle(x, y, w) {
 
 
 function drawFutureCircle(x, y, w) {
-    circle(x, y, 1.3*PPCM);
     stroke(color(250, 0, 0));
     strokeWeight(4);
     fill(color(200, 200, 200));
+    circle(x, y, 1.3*PPCM);
 }
 
 
@@ -380,7 +424,7 @@ function hoverTarget(i) {
 
 
 
-function drawSquares() {
+function drawOctagons() {
   fill(0);
   stroke(color(255));
   strokeWeight(1);
